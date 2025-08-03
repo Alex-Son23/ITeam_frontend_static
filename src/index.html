@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>ITeam.127 — Панель управления</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+  <!-- Модальное окно входа -->
+  <div id="loginModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
+      <div class="flex justify-center mb-6">
+        <div class="bg-blue-600 text-white p-3 rounded-full">
+          <i class="fas fa-user-shield text-3xl"></i>
+        </div>
+      </div>
+      <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Вход в систему</h2>
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Логин</label>
+          <input type="text" id="username" name="username" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Пароль</label>
+          <input type="password" id="password" name="password" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition">Войти</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Интерфейс -->
+  <div id="app" class="hidden h-screen">
+    <!-- Хедер -->
+    <header class="bg-white shadow p-4 flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <i class="fas fa-building text-blue-600 text-xl"></i>
+        <span class="text-xl font-bold text-blue-600">ITeam.127</span>
+      </div>
+      <div class="text-sm text-gray-600">Панель управления</div>
+    </header>
+
+    <div class="flex h-[calc(100vh-64px)]">
+
+      <!-- Боковое меню -->
+      <aside class="w-64 bg-white shadow-md p-4 space-y-4">
+        <nav class="flex flex-col space-y-2">
+          <a href="#" class="flex items-center text-blue-600 font-semibold hover:underline"><i class="fas fa-user-tie mr-2"></i> Управляющие</a>
+          <a href="#" class="flex items-center hover:text-blue-600"><i class="fas fa-users mr-2"></i> Пользователи</a>
+          <a href="#" class="flex items-center hover:text-blue-600"><i class="fas fa-chart-line mr-2"></i> Аналитика</a>
+        </nav>
+      </aside>
+
+      <!-- Контент -->
+      <main class="flex-1 p-6 space-y-8 overflow-auto">
+
+        <!-- Карточки управляющих -->
+        <section>
+          <h2 class="text-xl font-semibold mb-4">Арбитражные управляющие</h2>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-white p-4 shadow rounded">
+              <h3 class="font-bold text-gray-700 text-lg">Иванов И.И.</h3>
+              <p class="text-sm text-gray-500">5 должников</p>
+              <a href="#" class="text-blue-500 text-sm hover:underline">Открыть карточку</a>
+            </div>
+            <div class="bg-white p-4 shadow rounded">
+              <h3 class="font-bold text-gray-700 text-lg">Петров А.А.</h3>
+              <p class="text-sm text-gray-500">3 должника</p>
+              <a href="#" class="text-blue-500 text-sm hover:underline">Открыть карточку</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- Статистика и обновления -->
+        <section class="grid grid-cols-2 gap-6">
+          <div class="bg-white p-4 shadow rounded">
+            <h2 class="text-lg font-semibold mb-2">Статистика</h2>
+            <ul class="text-sm space-y-1">
+              <li>Всего управляющих: <strong>15</strong></li>
+              <li>Всего должников: <strong>72</strong></li>
+              <li>Исполнений завершено: <strong>31</strong></li>
+            </ul>
+          </div>
+          <div class="bg-white p-4 shadow rounded">
+            <h2 class="text-lg font-semibold mb-2">Последние обновления</h2>
+            <ul class="text-sm space-y-1">
+              <li>Иванов И.И. добавил нового должника</li>
+              <li>Петров А.А. завершил исполнительное производство</li>
+            </ul>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Минимальный JS -->
+  <script>
+  </script>
+</body>
+</html>

@@ -1,0 +1,460 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITeam.127 — Панель управления</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../static/css/style.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Логин форма -->
+    <div id="loginModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
+            <div class="flex justify-center mb-6">
+                <div class="bg-blue-600 text-white p-3 rounded-full">
+                    <i class="fas fa-user-shield text-3xl"></i>
+                </div>
+            </div>
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Вход в личный кабинет</h2>
+            <form id="loginForm" class="space-y-4" method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Логин</label>
+                    <input type="text" id="username" name="username" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Пароль</label>
+                    <input type="password" id="password" name="password" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="remember" name="remember" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="remember" class="ml-2 block text-sm text-gray-700">Запомнить меня</label>
+                    </div>
+                    <a href="{% url 'password_reset' %}" class="text-sm text-blue-600 hover:underline">Забыли пароль?</a>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150">
+                    Войти
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Основной интерфейс (скрыт до входа) -->
+    <div id="app" class="hidden">
+        <!-- Боковая панель -->
+        <div id="sidebar" class="sidebar fixed inset-y-0 left-0 bg-white shadow-md w-64 z-40">
+            <div class="flex items-center justify-center h-16 border-b border-gray-200 px-4">
+                <div class="flex items-center">
+                    <i class="fas fa-balance-scale-left text-blue-600 text-2xl"></i>
+                    <span class="logo-text ml-2 text-xl font-semibold text-gray-800">ITeam.127</span>
+                </div>
+            </div>
+            <div class="flex flex-col h-full py-4">
+                <a href="{% url 'dashboard' %}" class="flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50 cursor-pointer">
+                    <i class="fas fa-home text-blue-600"></i>
+                    <span class="sidebar-text ml-3">Главная</span>
+                </a>
+                <a href="{% url 'managers' %}" class="flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50 cursor-pointer">
+                    <i class="fas fa-users text-blue-600"></i>
+                    <span class="sidebar-text ml-3">Управляющие</span>
+                </a>
+                <a href="{% url 'debtors' %}" class="flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50 cursor-pointer">
+                    <i class="fas fa-file-invoice-dollar text-blue-600"></i>
+                    <span class="sidebar-text ml-3">Должники</span>
+                </a>
+                <a href="{% url 'analytics' %}" class="flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50 cursor-pointer">
+                    <i class="fas fa-chart-line text-blue-600"></i>
+                    <span class="sidebar-text ml-3">Аналитика</span>
+                </a>
+                <a href="{% url 'settings' %}" class="flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50 cursor-pointer">
+                    <i class="fas fa-cog text-blue-600"></i>
+                    <span class="sidebar-text ml-3">Настройки</span>
+                </a>
+                <div class="mt-auto px-4 py-3">
+                    <a href="{% url 'logout' %}" class="flex items-center text-gray-600 hover:bg-blue-50 cursor-pointer">
+                        <i class="fas fa-sign-out-alt text-blue-600"></i>
+                        <span class="sidebar-text ml-3">Выйти</span>
+                    </a>
+                </div>
+                <div class="px-4 py-2">
+                    <button id="toggleSidebar" class="w-full flex items-center justify-center text-gray-500 hover:text-blue-600">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Основное содержимое -->
+        <div class="main-content ml-64 min-h-screen">
+            <!-- Шапка -->
+            <header class="bg-white shadow-sm">
+                <div class="flex justify-between items-center px-6 py-4">
+                    <h1 class="text-2xl font-semibold text-gray-800" id="pageTitle">Главная</h1>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" placeholder="Поиск..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="relative">
+                            <button id="notificationsBtn" class="p-2 text-gray-600 hover:text-blue-600 relative">
+                                <i class="fas fa-bell"></i>
+                                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+                            </button>
+                            <div id="notificationsDropdown" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-50">
+                                <div class="p-4 border-b border-gray-200">
+                                    <h3 class="text-sm font-medium text-gray-800">Уведомления</h3>
+                                </div>
+                                <div class="max-h-60 overflow-y-auto">
+                                    {% for notification in notifications %}
+                                    <a href="{% url 'notification_detail' notification.id %}" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 border-b border-gray-200">
+                                        <div class="font-medium">{{ notification.title }}</div>
+                                        <div class="text-gray-500">{{ notification.text }}</div>
+                                    </a>
+                                    {% empty %}
+                                    <div class="px-4 py-3 text-sm text-gray-500">Нет новых уведомлений</div>
+                                    {% endfor %}
+                                </div>
+                                <div class="p-2 text-center">
+                                    <a href="{% url 'all_notifications' %}" class="text-xs text-blue-600 hover:underline">Показать все</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium">{{ user.first_name.0 }}{{ user.last_name.0 }}</div>
+                            <span class="ml-2 text-sm font-medium text-gray-700">{{ user.get_full_name }}</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Главная страница -->
+            <main id="homePage" class="p-6">
+                <div class="mb-6 flex justify-between items-center">
+                    <h2 class="text-xl font-semibold text-gray-800">Мои управляющие</h2>
+                    <button id="addManagerBtn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center">
+                        <i class="fas fa-plus mr-2"></i>
+                        <span>Добавить управляющего</span>
+                    </button>
+                </div>
+
+                <!-- Карточки управляющих -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    {% for manager in managers %}
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:border-blue-500 transition duration-150 cursor-pointer manager-card">
+                        <div class="p-6">
+                            <div class="flex items-center mb-4">
+                                <div class="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                                    <i class="fas fa-user-tie text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-semibold text-gray-800">{{ manager.last_name }} {{ manager.first_name }}</h3>
+                                    <p class="text-sm text-gray-500">ИНН: {{ manager.inn }}</p>
+                                </div>
+                            </div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span class="text-gray-600">Должников:</span>
+                                <span class="font-medium">{{ manager.debtors_count }}</span>
+                            </div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span class="text-gray-600">Активных дел:</span>
+                                <span class="font-medium">{{ manager.active_cases_count }}</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Завершено:</span>
+                                <span class="font-medium">{{ manager.completed_cases_count }}</span>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 px-6 py-3 flex justify-between items-center border-t border-gray-200">
+                            <span class="text-sm text-gray-500">Последнее обновление: {{ manager.last_update|date:"d.m.Y" }}</span>
+                            <button class="text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-span-full text-center py-8">
+                        <p class="text-gray-500">Управляющие не найдены. Добавьте первого управляющего.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Статистика -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Общая статистика</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-blue-50 rounded-lg p-4">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                                    <i class="fas fa-users text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Всего управляющих</p>
+                                    <p class="text-2xl font-bold text-gray-800">{{ total_managers }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-green-50 rounded-lg p-4">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                                    <i class="fas fa-file-invoice-dollar text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Всего должников</p>
+                                    <p class="text-2xl font-bold text-gray-800">{{ total_debtors }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-purple-50 rounded-lg p-4">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
+                                    <i class="fas fa-chart-pie text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Активных дел</p>
+                                    <p class="text-2xl font-bold text-gray-800">{{ total_active_cases }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Последние обновления -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Последние обновления</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Управляющий</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Должник</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Изменения</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                {% for update in recent_updates %}
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ update.date|date:"d.m.Y" }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ update.manager.get_full_name }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ update.debtor.name }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ update.description }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                            {% if update.status == 'new' %}bg-green-100 text-green-800{% elif update.status == 'updated' %}bg-blue-100 text-blue-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                            {% if update.status == 'new' %}Новое{% elif update.status == 'updated' %}Обновлено{% else %}{{ update.get_status_display }}{% endif %}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">Нет последних обновлений</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Страница управляющего -->
+            <main id="managerPage" class="p-6 hidden">
+                <div class="mb-6 flex justify-between items-center">
+                    <div>
+                        <button id="backToHome" class="text-blue-600 hover:text-blue-800 flex items-center">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            <span>Назад</span>
+                        </button>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button class="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 flex items-center">
+                            <i class="fas fa-download mr-2"></i>
+                            <span>Экспорт</span>
+                        </button>
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center">
+                            <i class="fas fa-sync-alt mr-2"></i>
+                            <span>Обновить</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Информация об управляющем -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                        <div class="flex items-center mb-4 md:mb-0">
+                            <div class="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-4">
+                                <i class="fas fa-user-tie text-3xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-800" id="managerName">{{ current_manager.get_full_name }}</h2>
+                                <p class="text-gray-600" id="managerInn">ИНН: {{ current_manager.inn }}</p>
+                            </div>
+                        </div>
+                        <div class="flex space-x-3">
+                            <button class="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 flex items-center">
+                                <i class="fas fa-edit mr-2"></i>
+                                <span>Редактировать</span>
+                            </button>
+                            <button class="bg-red-100 text-red-700 px-4 py-2 rounded-md hover:bg-red-200 flex items-center">
+                                <i class="fas fa-trash-alt mr-2"></i>
+                                <span>Удалить</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Фильтры -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Фильтры</h3>
+                    <form method="get" action="">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Статус</label>
+                                <select name="status" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Все</option>
+                                    <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Активные</option>
+                                    <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Завершенные</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Дата добавления</label>
+                                <select name="date_range" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">За все время</option>
+                                    <option value="month" {% if request.GET.date_range == 'month' %}selected{% endif %}>За последний месяц</option>
+                                    <option value="quarter" {% if request.GET.date_range == 'quarter' %}selected{% endif %}>За последние 3 месяца</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Сумма долга</label>
+                                <select name="debt_amount" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Любая</option>
+                                    <option value="small" {% if request.GET.debt_amount == 'small' %}selected{% endif %}>До 1 млн руб.</option>
+                                    <option value="medium" {% if request.GET.debt_amount == 'medium' %}selected{% endif %}>1-10 млн руб.</option>
+                                    <option value="large" {% if request.GET.debt_amount == 'large' %}selected{% endif %}>Более 10 млн руб.</option>
+                                </select>
+                            </div>
+                            <div class="flex items-end">
+                                <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                    Применить
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Должники -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800">Список должников</h3>
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" placeholder="Поиск должников..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-64">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {% for debtor in debtors %}
+                        <div class="debtor-card bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden transition duration-150 cursor-pointer">
+                            <div class="p-6">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <h4 class="text-lg font-semibold text-gray-800">{{ debtor.name }}</h4>
+                                        <p class="text-sm text-gray-500">ИНН: {{ debtor.inn }}</p>
+                                    </div>
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full 
+                                        {% if debtor.status == 'active' %}bg-blue-100 text-blue-800{% elif debtor.status == 'checking' %}bg-yellow-100 text-yellow-800{% elif debtor.status == 'completed' %}bg-green-100 text-green-800{% endif %}">
+                                        {% if debtor.status == 'active' %}Активно{% elif debtor.status == 'checking' %}На проверке{% elif debtor.status == 'completed' %}Завершено{% endif %}
+                                    </span>
+                                </div>
+                                <div class="mb-4">
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-gray-600">Сумма долга:</span>
+                                        <span class="font-medium">{{ debtor.debt_amount|floatformat:0 }} руб.</span>
+                                    </div>
+                                    <div class="progress-bar bg-gray-200 w-full">
+                                        <div class="progress-bar 
+                                            {% if debtor.status == 'active' %}bg-blue-600{% elif debtor.status == 'checking' %}bg-yellow-500{% elif debtor.status == 'completed' %}bg-green-600{% endif %}" 
+                                            style="width: {{ debtor.progress_percentage }}%"></div>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span class="text-gray-600">Дата начала:</span>
+                                    <span class="font-medium">{{ debtor.start_date|date:"d.m.Y" }}</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-600">Документов:</span>
+                                    <span class="font-medium">{{ debtor.documents_count }}</span>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 px-6 py-3 flex justify-between items-center border-t border-gray-200">
+                                <span class="text-sm text-gray-500">Дело №{{ debtor.case_number }}</span>
+                                <button class="text-blue-600 hover:text-blue-800">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-span-full text-center py-8">
+                            <p class="text-gray-500">Должники не найдены.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </main>
+
+            <!-- Модальное окно добавления управляющего -->
+            <div id="addManagerModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden">
+                <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold text-gray-800">Добавить управляющего</h3>
+                        <button id="closeAddManagerModal" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <form id="addManagerForm" class="space-y-4" method="post" action="{% url 'add_manager' %}">
+                        {% csrf_token %}
+                        <div>
+                            <label for="managerInnInput" class="block text-sm font-medium text-gray-700 mb-1">ИНН арбитражного управляющего</label>
+                            <input type="text" id="managerInnInput" name="inn" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Введите ИНН" required>
+                            <p class="mt-1 text-xs text-gray-500">ИНН состоит из 12 цифр</p>
+                        </div>
+                        <div class="flex justify-end space-x-3 pt-2">
+                            <button type="button" id="cancelAddManager" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                Отмена
+                            </button>
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                Добавить
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../static/js/script.js" defer></script>
+</body>
+</html>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            if (username === '1' && password === '1') {
+                document.getElementById('loginModal').classList.add('hidden');
+                document.getElementById('app').classList.remove('hidden');
+            } else {
+                alert('Неверный логин или пароль');
+            }
+        });
+    }
+});
+</script>
