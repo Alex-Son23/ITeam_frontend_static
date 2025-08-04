@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Управляющие — ITeam.127</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="../static/css/style.css"/>
+</head>
+<body class="bg-gray-50">
+  <div id="app">
+    <!-- Боковая панель -->
+    <div id="sidebar" class="sidebar fixed inset-y-0 left-0 bg-white shadow-md w-64 z-40">
+      <div class="flex items-center justify-center h-16 border-b border-gray-200 px-4">
+        <div class="flex items-center">
+          <i class="fas fa-balance-scale-left text-blue-600 text-2xl"></i>
+          <span class="logo-text ml-2 text-xl font-semibold text-gray-800">ITeam.127</span>
+        </div>
+      </div>
+      <div class="flex flex-col h-full py-4">
+        <a href="index.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50 cursor-pointer">
+          <i class="fas fa-home text-blue-600"></i>
+          <span class="sidebar-text ml-3">Главная</span>
+        </a>
+        <a href="all_managers.html" class="flex items-center px-4 py-3 text-gray-600 bg-blue-50 cursor-pointer">
+          <i class="fas fa-users text-blue-600"></i>
+          <span class="sidebar-text ml-3">Управляющие</span>
+        </a>
+        <a href="debtors.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50 cursor-pointer">
+          <i class="fas fa-file-invoice-dollar text-blue-600"></i>
+          <span class="sidebar-text ml-3">Должники</span>
+        </a>
+        <a href="analytics.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50 cursor-pointer">
+          <i class="fas fa-chart-line text-blue-600"></i>
+          <span class="sidebar-text ml-3">Аналитика</span>
+        </a>
+        <a href="settings.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50 cursor-pointer">
+          <i class="fas a-cog text-blue-600 fa-cog"></i>
+          <span class="sidebar-text ml-3">Настройки</span>
+        </a>
+        <div class="mt-auto px-4 py-3">
+          <a href="#" class="flex items-center text-gray-600 hover:bg-blue-50 cursor-pointer">
+            <i class="fas fa-sign-out-alt text-blue-600"></i>
+            <span class="sidebar-text ml-3">Выйти</span>
+          </a>
+        </div>
+        <div class="px-4 py-2">
+          <button id="toggleSidebar" class="w-full flex items-center justify-center text-gray-500 hover:text-blue-600">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Основное содержимое -->
+    <div class="main-content ml-64 min-h-screen">
+      <!-- Шапка -->
+      <header class="bg-white shadow-sm">
+        <div class="flex justify-between items-center px-6 py-4 h-16 border-b">
+          <h1 class="text-2xl font-semibold text-gray-800">Управляющие</h1>
+          <div class="flex items-center space-x-3">
+            <button id="reload" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center">
+              <i class="fas fa-sync-alt mr-2"></i>
+              <span>Обновить</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Контент -->
+      <main class="p-6">
+        <!-- Поиск/фильтры -->
+        <section class="bg-white rounded-lg shadow-md p-4 mb-6">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="text-sm text-gray-600">
+              Всего управляющих: <span class="font-semibold text-gray-800">6</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="relative">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input type="text" placeholder="Поиск по ФИО или ИНН..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-72">
+              </div>
+              <select class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Сортировка</option>
+                <option value="name">По имени</option>
+                <option value="debtors">По кол-ву должников</option>
+                <option value="updates">По обновлениям</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <!-- Сетка карточек -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Карточка -->
+            <a href="manager_detail.html" class="block bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:border-blue-500 hover:shadow-lg transition duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                            <i class="fas fa-user-tie text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-semibold text-gray-800">Иванов И.И.</h3>
+                            <p class="text-sm text-gray-500">ИНН: 123456789012</p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-gray-600">Должников:</span>
+                        <span class="font-medium">5</span>
+                    </div>
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-gray-600">Активных дел:</span>
+                        <span class="font-medium">3</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Завершено:</span>
+                        <span class="font-medium">8</span>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 px-6 py-3 flex justify-between items-center border-t border-gray-200">
+                    <span class="text-sm text-gray-500">Последнее обновление: 02.08.2025</span>
+                    <span class="text-blue-600 group-hover:text-blue-800">
+                    <i class="fas fa-chevron-right"></i>
+                    </span>
+                </div>
+            </a>
+
+
+            <a href="manager_detail.html" class="block bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:border-blue-500 hover:shadow-lg transition duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                            <i class="fas fa-user-tie text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-semibold text-gray-800">Иванов И.И.</h3>
+                            <p class="text-sm text-gray-500">ИНН: 123456789012</p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-gray-600">Должников:</span>
+                        <span class="font-medium">5</span>
+                    </div>
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-gray-600">Активных дел:</span>
+                        <span class="font-medium">3</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Завершено:</span>
+                        <span class="font-medium">8</span>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 px-6 py-3 flex justify-between items-center border-t border-gray-200">
+                    <span class="text-sm text-gray-500">Последнее обновление: 02.08.2025</span>
+                    <span class="text-blue-600 group-hover:text-blue-800">
+                    <i class="fas fa-chevron-right"></i>
+                    </span>
+                </div>
+            </a>
+
+            <a href="manager_detail.html" class="block bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:border-blue-500 hover:shadow-lg transition duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                            <i class="fas fa-user-tie text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-semibold text-gray-800">Иванов И.И.</h3>
+                            <p class="text-sm text-gray-500">ИНН: 123456789012</p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-gray-600">Должников:</span>
+                        <span class="font-medium">5</span>
+                    </div>
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-gray-600">Активных дел:</span>
+                        <span class="font-medium">3</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Завершено:</span>
+                        <span class="font-medium">8</span>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 px-6 py-3 flex justify-between items-center border-t border-gray-200">
+                    <span class="text-sm text-gray-500">Последнее обновление: 02.08.2025</span>
+                    <span class="text-blue-600 group-hover:text-blue-800">
+                    <i class="fas fa-chevron-right"></i>
+                    </span>
+                </div>
+            </a>
+
+          <!-- Ещё 3 примера -->
+            <a href="manager_detail.html" class="block bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:border-blue-500 hover:shadow-lg transition duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                            <i class="fas fa-user-tie text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-semibold text-gray-800">Иванов И.И.</h3>
+                            <p class="text-sm text-gray-500">ИНН: 123456789012</p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-gray-600">Должников:</span>
+                        <span class="font-medium">5</span>
+                    </div>
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-gray-600">Активных дел:</span>
+                        <span class="font-medium">3</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Завершено:</span>
+                        <span class="font-medium">8</span>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 px-6 py-3 flex justify-between items-center border-t border-gray-200">
+                    <span class="text-sm text-gray-500">Последнее обновление: 02.08.2025</span>
+                    <span class="text-blue-600 group-hover:text-blue-800">
+                    <i class="fas fa-chevron-right"></i>
+                    </span>
+                </div>
+            </a>
+
+            <a href="manager_detail.html" class="block bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:border-blue-500 hover:shadow-lg transition duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                            <i class="fas fa-user-tie text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-semibold text-gray-800">Иванов И.И.</h3>
+                            <p class="text-sm text-gray-500">ИНН: 123456789012</p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-gray-600">Должников:</span>
+                        <span class="font-medium">5</span>
+                    </div>
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-gray-600">Активных дел:</span>
+                        <span class="font-medium">3</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Завершено:</span>
+                        <span class="font-medium">8</span>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 px-6 py-3 flex justify-between items-center border-t border-gray-200">
+                    <span class="text-sm text-gray-500">Последнее обновление: 02.08.2025</span>
+                    <span class="text-blue-600 group-hover:text-blue-800">
+                    <i class="fas fa-chevron-right"></i>
+                    </span>
+                </div>
+            </a>
+
+        </section>
+
+        <!-- Пустое состояние (если нет карточек) -->
+        <!--
+        <section class="bg-white rounded-lg shadow-md p-8 mt-6 text-center text-gray-500">
+          Управляющие не найдены. Добавьте первого управляющего.
+        </section>
+        -->
+
+        <!-- Пагинация (статичная заглушка) -->
+        <nav class="flex items-center justify-between bg-white rounded-lg shadow-md px-4 py-3 mt-6">
+          <div class="text-sm text-gray-600">Показаны 1–6 из 6</div>
+          <div class="inline-flex -space-x-px rounded-md shadow-sm overflow-hidden">
+            <a href="#" class="px-3 py-2 border border-gray-300 bg-white text-sm text-gray-700 hover:bg-gray-50">Назад</a>
+            <a href="#" class="px-3 py-2 border border-gray-300 bg-blue-600 text-white text-sm">1</a>
+            <a href="#" class="px-3 py-2 border border-gray-300 bg-white text-sm text-gray-700 hover:bg-gray-50">2</a>
+            <a href="#" class="px-3 py-2 border border-gray-300 bg-white text-sm text-gray-700 hover:bg-gray-50">Вперёд</a>
+          </div>
+        </nav>
+      </main>
+    </div>
+  </div>
+
+  <!-- Минимальный JS -->
+  <script>
+    document.getElementById('reload')?.addEventListener('click', () => location.reload());
+  </script>
+</body>
+</html>
