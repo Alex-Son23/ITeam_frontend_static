@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Управляющий — Фамилия Имя</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../static/css/style.css">
+</head>
+<body class="bg-gray-50">
+  <div id="app">
+
+    <!-- ============ БОКОВАЯ ПАНЕЛЬ (без изменений) ============ -->
+    <div id="sidebar" class="sidebar fixed inset-y-0 left-0 bg-white shadow-md w-64 z-40">
+      <div class="flex items-center justify-center h-16 border-b border-gray-200 px-4">
+        <i class="fas fa-balance-scale-left text-blue-600 text-2xl"></i>
+        <span class="logo-text ml-2 text-xl font-semibold text-gray-800">ITeam.127</span>
+      </div>
+      <div class="flex flex-col h-full py-4">
+        <a href="index.html"         class="flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50"><i class="fas fa-home text-blue-600"></i><span class="ml-3">Главная</span></a>
+        <a href="all_managers.html"  class="flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50"><i class="fas fa-users text-blue-600"></i><span class="ml-3">Управляющие</span></a>
+        <a href="debtors.html"       class="flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50"><i class="fas fa-file-invoice-dollar text-blue-600"></i><span class="ml-3">Должники</span></a>
+        <a href="analytics.html"     class="flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50"><i class="fas fa-chart-line text-blue-600"></i><span class="ml-3">Аналитика</span></a>
+        <a href="settings.html"      class="flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50"><i class="fas fa-cog text-blue-600"></i><span class="ml-3">Настройки</span></a>
+        <div class="mt-auto px-4 py-3">
+          <a href="#" class="flex items-center text-gray-600 hover:bg-blue-50"><i class="fas fa-sign-out-alt text-blue-600"></i><span class="ml-3">Выйти</span></a>
+        </div>
+        <div class="px-4 py-2">
+          <button id="toggleSidebar" class="w-full flex items-center justify-center text-gray-500 hover:text-blue-600"><i class="fas fa-chevron-left"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ ОСНОВНОЙ КОНТЕНТ ============ -->
+    <div class="main-content ml-64 min-h-screen">
+
+      <!-- Шапка -->
+      <header class="bg-white shadow-sm">
+        <div class="flex justify-between items-center px-6 py-4 h-16 border-b">
+          <h1 class="text-2xl font-semibold text-gray-800" id="pageTitle">Управляющий</h1>
+          <div class="flex items-center space-x-4">
+            <div class="flex items-center">
+              <div class="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium"></div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- ===== ФОРМА начинается здесь ===== -->
+      <form id="managerForm" method="POST" action="" class="p-6 space-y-8">
+
+        <!-- Верхняя панель (кнопка «Редактировать» + старая «Обновить») -->
+        <div class="mb-6 flex justify-between items-center">
+          <a href="all_managers.html" class="text-blue-600 hover:text-blue-800 flex items-center">
+            <i class="fas fa-arrow-left mr-2"></i> Назад к списку
+          </a>
+          <div class="flex space-x-3">
+            <button id="editManagerBtn"
+                    type="button"
+                    class="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 flex items-center">
+              <i class="fas fa-edit mr-2"></i> Редактировать
+            </button>
+
+            <!-- «Обновить» БЕЗ перемещения: теперь сабмитит форму -->
+            <button id="reload"
+                    type="submit" name="action" value="refresh"
+                    class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center">
+              <i class="fas fa-sync-alt mr-2"></i> Обновить
+            </button>
+          </div>
+        </div>
+
+        <!-- ===== Карточка управляющего ===== -->
+        <section class="bg-white rounded-lg shadow-md p-6 mb-8">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div class="flex items-center mb-4 md:mb-0">
+              <div class="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-4">
+                <i class="fas fa-user-tie text-3xl"></i>
+              </div>
+              <div>
+                <h2 class="text-2xl font-bold text-gray-800" id="managerName">Иванов Иван Иванович</h2>
+                <p class="text-gray-600" id="managerInn">ИНН: 123456789012</p>
+              </div>
+            </div>
+            <div class="text-sm text-gray-600">
+              <span class="mr-2">Email:</span>
+              <span class="font-medium" id="managerEmail">ivanov@example.com</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <div class="space-y-2">
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">СНИЛС:</span>
+                <span class="font-medium" id="managerSnils">123-456-789 01</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">СРО:</span>
+                <span class="font-medium" id="managerSro">СРО №1</span>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">Адрес для корреспонденции:</span>
+                <span class="font-medium text-right" id="managerAddress">г. Москва, ул. Примерная, д. 1</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">Последнее обновление:</span>
+                <span class="font-medium">02.08.2025</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== Дополнительная информация (Реквизиты / Комментарий) ===== -->
+        <section class="bg-white rounded-lg shadow-md p-6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">Дополнительная информация</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="requisites" class="block text-sm font-medium text-gray-700 mb-1">Реквизиты</label>
+              <textarea id="requisites" name="requisites" rows="4"
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                placeholder="Банк, счёт, БИК…"></textarea>
+            </div>
+            <div>
+              <label for="comment" class="block text-sm font-medium text-gray-700 mb-1">Комментарий</label>
+              <textarea id="comment" name="comment" rows="4"
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                placeholder="Ваш комментарий"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== Таблица должников (с двумя галочками) ===== -->
+        <section class="bg-white rounded-lg shadow-md p-6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-6">Список должников</h3>
+
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 text-sm">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left  text-xs font-medium text-gray-500 uppercase">ФИО</th>
+                  <th class="px-6 py-3 text-left  text-xs font-medium text-gray-500 uppercase">ИНН</th>
+                  <th class="px-6 py-3 text-left  text-xs font-medium text-gray-500 uppercase">Дата начала</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Процедур</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Активных</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Сумма долга</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Дел в работе</th>
+                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Взят<br>в&nbsp;работу</th>
+                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Выбрать</th>
+                  <th class="px-6 py-3"></th>
+                </tr>
+              </thead>
+
+              <tbody class="bg-white divide-y divide-gray-200">
+
+                <!-- ====== Строка 1 ====== -->
+                <tr class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <a href="debtor_detail.html" class="text-blue-600 hover:text-blue-800 font-medium">
+                      Иванов И. И.
+                    </a>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-gray-700">123456789012</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-gray-500">15.01.2024</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right font-medium">3</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right font-medium">2</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right font-medium">120 000 ₽</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right font-medium">1</td>
+
+                  <!-- Галочка «взят в работу» -->
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <input type="checkbox" name="taken_in_work[123456789012]"
+                           class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                  </td>
+
+                  <!-- Галочка «выбрать» -->
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <input type="checkbox" name="select_debtor[]" value="123456789012"
+                           class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                  </td>
+
+                  <!-- Стрелка -->
+                  <td class="px-6 py-4 whitespace-nowrap text-right">
+                    <a href="debtor_detail.html" class="text-blue-600 hover:text-blue-800">
+                      <i class="fas fa-chevron-right"></i>
+                    </a>
+                  </td>
+                </tr>
+
+                <!-- ====== Строка 2 (пример) ====== -->
+                <tr class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <a href="debtor_detail.html" class="text-blue-600 hover:text-blue-800 font-medium">
+                      Петров П. П.
+                    </a>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-gray-700">234567890123</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-gray-500">21.02.2024</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right font-medium">2</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right font-medium">1</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right font-medium">80 000 ₽</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right font-medium">2</td>
+
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <input type="checkbox" name="taken_in_work[234567890123]" checked
+                           class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <input type="checkbox" name="select_debtor[]" value="234567890123"
+                           class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right">
+                    <a href="debtor_detail.html" class="text-blue-600 hover:text-blue-800">
+                      <i class="fas fa-chevron-right"></i>
+                    </a>
+                  </td>
+                </tr>
+
+                <!-- …добавьте другие строки аналогично… -->
+
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ===== Кнопка сохранения ===== -->
+        <div class="flex justify-end pb-12">
+          <button type="submit" name="action" value="save"
+            class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 focus:ring-2 focus:ring-green-500">
+            Сохранить изменения
+          </button>
+        </div>
+      </form>
+      <!-- ===== /ФОРМА ===== -->
+    </div>
+  </div>
+
+  <!-- ========= МОДАЛЬНОЕ ОКНО (осталось без изменений) ========= -->
+  <div id="editManagerModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 overflow-y-auto flex items-start justify-center z-50 py-8 hidden">
+    <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold text-gray-800">Редактировать управляющего</h3>
+        <button id="closeEditManagerModal" class="text-gray-500 hover:text-gray-700">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Форма редактирования: поля и имена соответствуют твоей модели -->
+      <form id="editManagerForm" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Фамилия</label>
+            <input type="text" id="lastName" name="last_name"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="Иванов" value="Иванов" required>
+          </div>
+          <div>
+            <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">Имя</label>
+            <input type="text" id="firstName" name="first_name"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="Иван" value="Иван" required>
+          </div>
+          <div class="md:col-span-2">
+            <label for="middleName" class="block text-sm font-medium text-gray-700 mb-1">Отчество</label>
+            <input type="text" id="middleName" name="middle_name"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="Иванович" value="Иванович">
+          </div>
+        </div>
+
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input type="email" id="email" name="email"
+                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                 placeholder="ivanov@example.com" value="ivanov@example.com">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="inn" class="block text-sm font-medium text-gray-700 mb-1">ИНН</label>
+            <input type="text" id="inn" name="inn" pattern="\d{12}" maxlength="12"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="123456789012" value="123456789012" required>
+            <p class="mt-1 text-xs text-gray-500">ИНН состоит из 12 цифр</p>
+          </div>
+          <div>
+            <label for="snils" class="block text-sm font-medium text-gray-700 mb-1">СНИЛС</label>
+            <input type="text" id="snils" name="snils" pattern="\d{11}" maxlength="11"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="12345678901" value="12345678901">
+            <p class="mt-1 text-xs text-gray-500">СНИЛС состоит из 11 цифр</p>
+          </div>
+        </div>
+
+        <div>
+          <label for="sro" class="block text-sm font-medium text-gray-700 mb-1">СРО</label>
+          <select id="sro" name="sro"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Выберите СРО</option>
+            <option value="1" selected>СРО №1</option>
+            <option value="2">СРО №2</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="correspondenceAddress" class="block text-sm font-medium text-gray-700 mb-1">Адрес для корреспонденции</label>
+          <textarea id="correspondenceAddress" name="correspondence_address" rows="3"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Город, улица, дом" required>г. Москва, ул. Примерная, д. 1</textarea>
+        </div>
+
+        <div class="flex justify-end space-x-3 pt-2">
+          <button type="button" id="cancelEditManager"
+                  class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            Отмена
+          </button>
+          <button type="submit"
+                  class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            Сохранить
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/manager_detail.js" defer></script>
+</body>
+</html>
+
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Управляющий — Фамилия Имя</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../static/css/style.css">
+</head>
+<body class="bg-gray-50">
+  <div id="app">
+    <!-- Боковая панель -->
+    <div id="sidebar" class="sidebar fixed inset-y-0 left-0 bg-white shadow-md w-64 z-40">
+      <div class="flex items-center justify-center h-16 border-b border-gray-200 px-4">
+        <div class="flex items-center">
+          <i class="fas fa-balance-scale-left text-blue-600 text-2xl"></i>
+          <span class="logo-text ml-2 text-xl font-semibold text-gray-800">ITeam.127</span>
+        </div>
+      </div>
+      <div class="flex flex-col h-full py-4">
+        <a href="index.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50 cursor-pointer">
+          <i class="fas fa-home text-blue-600"></i>
+          <span class="sidebar-text ml-3">Главная</span>
+        </a>
+        <a href="all_managers.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50 cursor-pointer">
+          <i class="fas fa-users text-blue-600"></i>
+          <span class="sidebar-text ml-3">Управляющие</span>
+        </a>
+        <a href="debtors.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50 cursor-pointer">
+          <i class="fas fa-file-invoice-dollar text-blue-600"></i>
+          <span class="sidebar-text ml-3">Должники</span>
+        </a>
+        <a href="analytics.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50 cursor-pointer">
+          <i class="fas fa-chart-line text-blue-600"></i>
+          <span class="sidebar-text ml-3">Аналитика</span>
+        </a>
+        <a href="settings.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50 cursor-pointer">
+          <i class="fas fa-cog text-blue-600"></i>
+          <span class="sidebar-text ml-3">Настройки</span>
+        </a>
+        <div class="mt-auto px-4 py-3">
+          <a href="#" class="flex items-center text-gray-600 hover:bg-blue-50 cursor-pointer">
+            <i class="fas fa-sign-out-alt text-blue-600"></i>
+            <span class="sidebar-text ml-3">Выйти</span>
+          </a>
+        </div>
+        <div class="px-4 py-2">
+          <button id="toggleSidebar" class="w-full flex items-center justify-center text-gray-500 hover:text-blue-600">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Основное содержимое -->
+    <div class="main-content ml-64 min-h-screen">
+      <!-- Шапка -->
+      <header class="bg-white shadow-sm">
+        <div class="flex justify-between items-center px-6 py-4 h-16 border-b">
+          <h1 class="text-2xl font-semibold text-gray-800" id="pageTitle">Управляющий</h1>
+          <div class="flex items-center space-x-4">
+            <div class="flex items-center">
+              <div class="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium"></div>
+              <span class="ml-2 text-sm font-medium text-gray-700"></span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Страница управляющего -->
+      <main id="managerPage" class="p-6">
+        <!-- Верхняя панель -->
+        <div class="mb-6 flex justify-between items-center">
+          <div>
+            <a href="all_managers.html" class="text-blue-600 hover:text-blue-800 flex items-center">
+              <i class="fas fa-arrow-left mr-2"></i>
+              <span>Назад к списку</span>
+            </a>
+          </div>
+          <div class="flex space-x-3">
+            <button id="editManagerBtn" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 flex items-center">
+              <i class="fas fa-edit mr-2"></i>
+              <span>Редактировать</span>
+            </button>
+            <button id="reload" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center">
+              <i class="fas fa-sync-alt mr-2"></i>
+              <span>Обновить</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Информация об управляющем -->
+        <section class="bg-white rounded-lg shadow-md p-6 mb-8">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div class="flex items-center mb-4 md:mb-0">
+              <div class="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-4">
+                <i class="fas fa-user-tie text-3xl"></i>
+              </div>
+              <div>
+                <h2 class="text-2xl font-bold text-gray-800" id="managerName">Иванов Иван Иванович</h2>
+                <p class="text-gray-600" id="managerInn">ИНН: 123456789012</p>
+              </div>
+            </div>
+            <div class="text-sm text-gray-600">
+              <span class="mr-2">Email:</span>
+              <span class="font-medium" id="managerEmail">ivanov@example.com</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <div class="space-y-2">
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">СНИЛС:</span>
+                <span class="font-medium" id="managerSnils">123-456-789 01</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">СРО:</span>
+                <span class="font-medium" id="managerSro">СРО №1</span>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">Адрес для корреспонденции:</span>
+                <span class="font-medium text-right" id="managerAddress">г. Москва, ул. Примерная, д. 1</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">Последнее обновление:</span>
+                <span class="font-medium">02.08.2025</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Список должников управляющего (ТАБЛИЦА) -->
+        <section class="bg-white rounded-lg shadow-md p-6">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-semibold text-gray-800">Список должников</h3>
+            <!-- при желании можно вернуть поиск -->
+            <!--
+            <div class="relative">
+              <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <input type="text" placeholder="Поиск по ФИО или ИНН..."
+                    class="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-72">
+            </div>
+            -->
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ФИО</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ИНН</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата начала</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Кол-во процедур</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Активных процедур</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Сумма долга</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Дел в работе</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Действие</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200 text-sm">
+                <!-- Строка 1 -->
+                <tr class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <a href="debtor_detail.html" class="text-blue-600 hover:text-blue-800 font-medium">
+                      Иванов Иван Иванович
+                    </a>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-gray-700">123456789012</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-gray-500">15.01.2024</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right font-medium">3</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right font-medium">2</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right font-medium">120&nbsp;000&nbsp;₽</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right font-medium">1</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right">
+                    <a href="debtor_detail.html" class="text-blue-600 hover:text-blue-800">
+                      <i class="fas fa-chevron-right"></i>
+                    </a>
+                  </td>
+                </tr>
+
+                <!-- Строка 2 -->
+                <tr class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <a href="debtor_detail.html" class="text-blue-600 hover:text-blue-800 font-medium">
+                      Петров Пётр Петрович
+                    </a>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-gray-700">234567890123</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-gray-500">21.02.2024</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right font-medium">2</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right font-medium">1</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right font-medium">80&nbsp;000&nbsp;₽</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right font-medium">2</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right">
+                    <a href="debtor_detail.html" class="text-blue-600 hover:text-blue-800">
+                      <i class="fas fa-chevron-right"></i>
+                    </a>
+                  </td>
+                </tr>
+
+                <!-- Строка 3 -->
+                <tr class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <a href="debtor_detail.html" class="text-blue-600 hover:text-blue-800 font-medium">
+                      Сидоров Сергей Сергеевич
+                    </a>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-gray-700">345678901234</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-gray-500">10.03.2024</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right font-medium">4</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right font-medium">0</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right font-medium">250&nbsp;000&nbsp;₽</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right font-medium">0</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right">
+                    <a href="debtor_detail.html" class="text-blue-600 hover:text-blue-800">
+                      <i class="fas fa-chevron-right"></i>
+                    </a>
+                  </td>
+                </tr>
+
+                <!-- Пустое состояние -->
+                <!--
+                <tr>
+                  <td colspan="8" class="px-6 py-8 text-center text-gray-500">
+                    Должники не найдены.
+                  </td>
+                </tr>
+                -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Список должников управляющего -->
+        <!-- <section class="bg-white rounded-lg shadow-md p-6">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-semibold text-gray-800">Список должников</h3>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">                    
+              <a class="debtor-card bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden transition duration-150 cursor-pointer" href="debtor_detail.html">
+                  <div class="p-6">
+                      <div class="flex justify-between items-start mb-4">
+                          <div>
+                              <h4 class="text-lg font-semibold text-gray-800"></h4>
+                              <p class="text-sm text-gray-500">ИНН: 123123123123</p>
+                          </div>
+                          <span class="px-2 py-1 text-xs font-semibold rounded-full 
+                              bg-green-100 text-green-800">
+                              Активно
+                          </span>
+                      </div>
+                      <div class="mb-4">
+                          <div class="flex justify-between text-sm mb-1">
+                              <span class="text-gray-600">Сумма долга:</span>
+                              <span class="font-medium">10000 руб.</span>
+                          </div>
+                          <div class="bg-gray-200 w-100 mt-4 rounded">
+                              <div class="bg-green-600 h-2 rounded" style="width: 60%"></div>
+                          </div>
+                      </div>
+                      <div class="flex justify-between text-sm mb-2">
+                          <span class="text-gray-600">Дата начала:</span>
+                          <span class="font-medium">15.01.2003</span>
+                      </div>
+                      <div class="flex justify-between text-sm">
+                          <span class="text-gray-600">Документов:</span>
+                          <span class="font-medium">1</span>
+                      </div>
+                  </div>
+                  <div class="bg-gray-50 px-6 py-3 flex justify-between items-center border-t border-gray-200">
+                      <span class="text-sm text-gray-500">Дело № 1</span>
+                      <button class="text-blue-600 hover:text-blue-800">
+                          <i class="fas fa-chevron-right"></i>
+                      </button>
+                  </div>
+              </a >
+
+              <a class="debtor-card bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden transition duration-150 cursor-pointer">
+                  <div class="p-6">
+                      <div class="flex justify-between items-start mb-4">
+                          <div>
+                              <h4 class="text-lg font-semibold text-gray-800"></h4>
+                              <p class="text-sm text-gray-500">ИНН: 123123123123</p>
+                          </div>
+                          <span class="px-2 py-1 text-xs font-semibold rounded-full 
+                              bg-blue-100 text-blue-800">
+                              На проверке
+                          </span>
+                      </div>
+                      <div class="mb-4">
+                          <div class="flex justify-between text-sm mb-1">
+                              <span class="text-gray-600">Сумма долга:</span>
+                              <span class="font-medium">10000 руб.</span>
+                          </div>
+                          <div class="bg-gray-200 w-100 rounded mt-4">
+                              <div class="bg-blue-600 h-2 rounded" style="width: 80%"></div>
+                          </div>
+                      </div>
+                      <div class="flex justify-between text-sm mb-2">
+                          <span class="text-gray-600">Дата начала:</span>
+                          <span class="font-medium">21.01.2001</span>
+                      </div>
+                      <div class="flex justify-between text-sm">
+                          <span class="text-gray-600">Документов:</span>
+                          <span class="font-medium">1</span>
+                      </div>
+                  </div>
+                  <div class="bg-gray-50 px-6 py-3 flex justify-between items-center border-t border-gray-200">
+                      <span class="text-sm text-gray-500">Дело № 2</span>
+                      <button class="text-blue-600 hover:text-blue-800">
+                          <i class="fas fa-chevron-right"></i>
+                      </button>
+                  </div>
+              </a>
+
+              <a class="debtor-card bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden transition duration-150 cursor-pointer">
+                  <div class="p-6">
+                      <div class="flex justify-between items-start mb-4">
+                          <div>
+                              <h4 class="text-lg font-semibold text-gray-800"></h4>
+                              <p class="text-sm text-gray-500">ИНН: 123123123123</p>
+                          </div>
+                          <span class="px-2 py-1 text-xs font-semibold rounded-full 
+                              bg-gray-100 text-gray-800">
+                              Завершено
+                          </span>
+                      </div>
+                      <div class="mb-4">
+                          <div class="flex justify-between text-sm mb-1">
+                              <span class="text-gray-600">Сумма долга:</span>
+                              <span class="font-medium">10000 руб.</span>
+                          </div>
+                          <div class="bg-gray-200 w-100 mt-4 rounded">
+                              <div class="bg-yellow-500 h-2 rounded" style="width: 100%"></div>
+                          </div>
+                      </div>
+                      <div class="flex justify-between text-sm mb-2">
+                          <span class="text-gray-600">Дата начала:</span>
+                          <span class="font-medium">24.01.2000</span>
+                      </div>
+                      <div class="flex justify-between text-sm">
+                          <span class="text-gray-600">Документов: 3</span>
+                          <span class="font-medium"></span>
+                      </div>
+                  </div>
+                  <div class="bg-gray-50 px-6 py-3 flex justify-between items-center border-t border-gray-200">
+                      <span class="text-sm text-gray-500">Дело №</span>
+                      <button class="text-blue-600 hover:text-blue-800">
+                          <i class="fas fa-chevron-right"></i>
+                      </button>
+                  </div>
+              </a>
+              
+              <div class="col-span-full text-center py-8 hidden">
+                  <p class="text-gray-500">Должники не найдены.</p>
+              </div>
+              
+          </div>
+        </section> -->
+      </main>
+    </div>
+  </div>
+
+  <!-- Модальное окно «Редактировать управляющего» -->
+  <div id="editManagerModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 overflow-y-auto flex items-start justify-center z-50 py-8 hidden">
+    <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold text-gray-800">Редактировать управляющего</h3>
+        <button id="closeEditManagerModal" class="text-gray-500 hover:text-gray-700">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Форма редактирования: поля и имена соответствуют твоей модели -->
+      <form id="editManagerForm" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Фамилия</label>
+            <input type="text" id="lastName" name="last_name"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="Иванов" value="Иванов" required>
+          </div>
+          <div>
+            <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">Имя</label>
+            <input type="text" id="firstName" name="first_name"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="Иван" value="Иван" required>
+          </div>
+          <div class="md:col-span-2">
+            <label for="middleName" class="block text-sm font-medium text-gray-700 mb-1">Отчество</label>
+            <input type="text" id="middleName" name="middle_name"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="Иванович" value="Иванович">
+          </div>
+        </div>
+
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input type="email" id="email" name="email"
+                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                 placeholder="ivanov@example.com" value="ivanov@example.com">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="inn" class="block text-sm font-medium text-gray-700 mb-1">ИНН</label>
+            <input type="text" id="inn" name="inn" pattern="\d{12}" maxlength="12"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="123456789012" value="123456789012" required>
+            <p class="mt-1 text-xs text-gray-500">ИНН состоит из 12 цифр</p>
+          </div>
+          <div>
+            <label for="snils" class="block text-sm font-medium text-gray-700 mb-1">СНИЛС</label>
+            <input type="text" id="snils" name="snils" pattern="\d{11}" maxlength="11"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="12345678901" value="12345678901">
+            <p class="mt-1 text-xs text-gray-500">СНИЛС состоит из 11 цифр</p>
+          </div>
+        </div>
+
+        <div>
+          <label for="sro" class="block text-sm font-medium text-gray-700 mb-1">СРО</label>
+          <select id="sro" name="sro"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Выберите СРО</option>
+            <option value="1" selected>СРО №1</option>
+            <option value="2">СРО №2</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="correspondenceAddress" class="block text-sm font-medium text-gray-700 mb-1">Адрес для корреспонденции</label>
+          <textarea id="correspondenceAddress" name="correspondence_address" rows="3"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Город, улица, дом" required>г. Москва, ул. Примерная, д. 1</textarea>
+        </div>
+
+        <div class="flex justify-end space-x-3 pt-2">
+          <button type="button" id="cancelEditManager"
+                  class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            Отмена
+          </button>
+          <button type="submit"
+                  class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            Сохранить
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Минимальный JS -->
+  <!-- <script>
+    // Обновить страницу
+    document.getElementById('reload')?.addEventListener('click', () => location.reload());
+
+    // Модалка «Редактировать управляющего»
+    const editBtn = document.getElementById('editManagerBtn');
+    const modal = document.getElementById('editManagerModal');
+    const closeBtn = document.getElementById('closeEditManagerModal');
+    const cancelBtn = document.getElementById('cancelEditManager');
+    const form = document.getElementById('editManagerForm');
+
+    editBtn?.addEventListener('click', () => modal.classList.remove('hidden'));
+    closeBtn?.addEventListener('click', () => modal.classList.add('hidden'));
+    cancelBtn?.addEventListener('click', () => modal.classList.add('hidden'));
+    form?.addEventListener('submit', function(e) {
+      e.preventDefault();
+      // Здесь можно собрать данные и отправить на сервер
+      modal.classList.add('hidden');
+      // Обновить данные на странице вручную, если нужно
+      // document.getElementById('managerName').textContent = ...
+      // document.getElementById('managerEmail').textContent = ...
+      // document.getElementById('managerSnils').textContent = ...
+      // document.getElementById('managerSro').textContent = ...
+      // document.getElementById('managerAddress').textContent = ...
+    });
+  </script> -->
+  <script src="js/manager_detail.js"></script>
+</body>
+</html>
